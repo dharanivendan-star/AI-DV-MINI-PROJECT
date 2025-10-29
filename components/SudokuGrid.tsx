@@ -11,9 +11,10 @@ interface SudokuGridProps {
     selectedCell: { row: number, col: number } | null;
     onSelectCell: (cell: { row: number, col: number } | null) => void;
     isLoading: boolean;
+    isAiMode: boolean;
 }
 
-const SudokuGrid: React.FC<SudokuGridProps> = ({ board, initialBoard, onCellChange, selectedCell, onSelectCell, isLoading }) => {
+const SudokuGrid: React.FC<SudokuGridProps> = ({ board, initialBoard, onCellChange, selectedCell, onSelectCell, isLoading, isAiMode }) => {
 
     const isPeer = (r1: number, c1: number, r2: number, c2: number) => {
         if (r1 === r2 && c1 === c2) return false;
@@ -46,6 +47,7 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ board, initialBoard, onCellChan
                                 isPeer={cellIsPeer}
                                 isSameValue={isSameValue}
                                 isIncorrect={isIncorrect}
+                                isAiMode={isAiMode}
                                 onSelect={() => onSelectCell({ row: rowIndex, col: colIndex })}
                                 onChange={(val) => onCellChange(rowIndex, colIndex, val)}
                             />

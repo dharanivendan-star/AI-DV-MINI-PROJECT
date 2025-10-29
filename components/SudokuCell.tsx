@@ -11,6 +11,7 @@ const SudokuCell: React.FC<SudokuCellProps> = ({
     isPeer,
     isSameValue,
     isIncorrect,
+    isAiMode,
     onSelect,
     onChange
 }) => {
@@ -30,11 +31,14 @@ const SudokuCell: React.FC<SudokuCellProps> = ({
         border-collapse
     `;
     
+    const canInteract = !isInitial && !isAiMode;
+    
     let colorClasses = '';
     if (isInitial) {
         colorClasses = 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold';
     } else {
-        colorClasses = 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 cursor-pointer';
+        colorClasses = 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400';
+        colorClasses += canInteract ? ' cursor-pointer' : ' cursor-not-allowed';
     }
     
     if (isSelected) {
@@ -54,7 +58,7 @@ const SudokuCell: React.FC<SudokuCellProps> = ({
     return (
         <div
             className={`aspect-square ${borderClasses}`}
-            onClick={!isInitial ? onSelect : undefined}
+            onClick={canInteract ? onSelect : undefined}
         >
             <input
                 type="text"
@@ -62,8 +66,8 @@ const SudokuCell: React.FC<SudokuCellProps> = ({
                 maxLength={1}
                 value={value === 0 ? '' : value}
                 onChange={handleChange}
-                onFocus={!isInitial ? onSelect : undefined}
-                readOnly={isInitial}
+                onFocus={canInteract ? onSelect : undefined}
+                readOnly={!canInteract}
                 className={`${baseClasses} ${colorClasses}`}
                 aria-label={`Sudoku cell at row ${row + 1}, column ${col + 1}`}
             />

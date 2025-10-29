@@ -150,3 +150,21 @@ export const hasConflict = (board: Board, row: number, col: number): boolean => 
 
     return false;
 };
+
+export const getHint = (board: Board): { row: number; col: number; value: number } | null => {
+    const find = findEmpty(board);
+    if (!find) {
+        return null; // Board is already solved
+    }
+
+    // Create a copy to find the solution without modifying the original board
+    const solutionBoard = JSON.parse(JSON.stringify(board));
+    
+    if (solve(solutionBoard)) {
+        // Find the first empty cell in the original board and return the corresponding value from the solved board.
+        const [row, col] = find;
+        return { row, col, value: solutionBoard[row][col] };
+    }
+
+    return null; // No valid move found that leads to a solution
+};

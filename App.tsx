@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import SudokuGrid from './components/SudokuGrid';
 import Controls from './components/Controls';
-import { generateFullBoard, removeCells, solve, valid } from './services/sudokuService';
+import { generateFullBoard, removeCells, solve, valid, getHint } from './services/sudokuService';
 import type { Board, Difficulty } from './types';
 import { produce } from 'immer';
 
@@ -13,6 +13,7 @@ const App: React.FC = () => {
     const [difficulty, setDifficulty] = useState<Difficulty>('Easy');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
+    const [isAiMode, setIsAiMode] = useState<boolean>(false);
 
     const generateNewPuzzle = useCallback(() => {
         setIsLoading(true);
@@ -22,6 +23,7 @@ const App: React.FC = () => {
             setInitialBoard(puzzle);
             setBoard(puzzle);
             setSelectedCell(null);
+            setIsAiMode(false); // Reset to manual mode on new puzzle
             setIsLoading(false);
         }, 50); // Timeout to allow UI update
     }, [difficulty]);
@@ -39,6 +41,7 @@ const App: React.FC = () => {
         const boardToSolve = JSON.parse(JSON.stringify(initialBoard));
         if (solve(boardToSolve)) {
             setBoard(boardToSolve);
+            setSelectedCell(null);
         } else {
             // In a real app, you might show an alert to the user.
             console.warn("Could not solve the puzzle.");
@@ -50,7 +53,28 @@ const App: React.FC = () => {
         setSelectedCell(null);
     };
 
+    const handleAiStep = () => {
+        setIsLoading(true);
+        // Use a timeout to allow the loader to show
+        setTimeout(() => {
+            const hint = getHint(board);
+            if (hint) {
+                const { row, col, value } = hint;
+                const newBoard = produce(board, draft => {
+                    draft[row][col] = value;
+                });
+                setBoard(newBoard);
+                setSelectedCell({ row, col });
+            } else {
+                alert("The puzzle is complete or no further moves are possible!");
+            }
+            setIsLoading(false);
+        }, 20); 
+    };
+
     const handleCellChange = (row: number, col: number, value: number) => {
+        if (isAiMode) return; // Prevent manual changes in AI mode
+
         const newBoard = produce(board, draft => {
             const oldValue = draft[row][col];
             if (value === oldValue) return; // No change
@@ -102,6 +126,9 @@ const App: React.FC = () => {
                         onSolve={handleSolve}
                         onClear={handleClear}
                         isLoading={isLoading}
+                        isAiMode={isAiMode}
+                        onAiModeChange={setIsAiMode}
+                        onAiStep={handleAiStep}
                     />
                     <SudokuGrid
                         board={board}
@@ -110,6 +137,7 @@ const App: React.FC = () => {
                         selectedCell={selectedCell}
                         onSelectCell={setSelectedCell}
                         isLoading={isLoading}
+                        isAiMode={isAiMode}
                     />
                 </main>
             </div>

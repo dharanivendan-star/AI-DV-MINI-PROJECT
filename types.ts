@@ -12,6 +12,7 @@ export interface SudokuCellProps {
     isPeer: boolean;
     isSameValue: boolean;
     isIncorrect: boolean;
+    isAiMode: boolean;
     onSelect: () => void;
     onChange: (value: number) => void;
 }
