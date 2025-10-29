@@ -1,0 +1,5 @@
+{
+  "name": "AI Sudoku Solver",
+  "description": "An intelligent Sudoku application that generates puzzles of varying difficulty, provides hints, and offers a unique AI-assisted filling feature to enhance the solving experience. Built with React and Tailwind CSS.",
+  "requestFramePermissions": []
+}
